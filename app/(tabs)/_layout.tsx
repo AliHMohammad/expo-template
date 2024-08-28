@@ -13,6 +13,14 @@ export default function TabLayout() {
                 }}
             />
             <Tabs.Screen
+                name="restaurants"
+                options={{
+                    title: "Restaurants",
+                    tabBarIcon: ({ color }) => <FontAwesome size={28} name="search" color={color} />,
+                    headerShown: false
+                }}
+            />
+            <Tabs.Screen
                 name="profile"
                 options={{
                     title: "Profile",
@@ -22,3 +30,4 @@ export default function TabLayout() {
         </Tabs>
     );
 }
+

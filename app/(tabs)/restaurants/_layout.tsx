@@ -16,6 +16,12 @@ export default function _layout() {
                     title: "Restaurant Details",
                 }}
             />
+            <Stack.Screen
+                name="create"
+                options={{
+                    title: "Create Restaurant",
+                }}
+            />
         </Stack>
     );
 }

@@ -1,7 +1,7 @@
-import { ScrollView, Text, TextInput, View } from "react-native";
-import { useRouter } from "expo-router";
+import { Button, ScrollView, View } from "react-native";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { RestaurantCard } from "../../../components/RestaurantCard";
-import React from "react";
+import React, { useEffect } from "react";
 
 const INIT_DATA = [
     {
@@ -20,8 +20,16 @@ const INIT_DATA = [
 
 export default function RestaurantsPage() {
     const [restaurants, setRestaurants] = React.useState([...INIT_DATA]);
-    const [input, setInput] = React.useState("");
+    const { name } = useLocalSearchParams<{ name: string }>();
     const router = useRouter();
+
+    useEffect(() => {
+        // Vi sender name tilbage som param fra create.tsx
+        // Derfor skal der ske noget hvis name param er defineret her. Usestate skal opdateres og trigger et rerender 
+        if (!name)
+            return;
+        setRestaurants((prev) => [...prev, { id: prev.length, name: name }]);
+    }, [name])
 
     const handlePress = (name: string) => {
         // Du kan også skrive:
@@ -32,18 +40,10 @@ export default function RestaurantsPage() {
         router.push(`/restaurants/${name}`);
     };
 
-    const handleCreate = () => {
-        if (input === "") return;
-
-        setRestaurants((prev) => [...prev, { id: prev.length, name: input }]);
-        setInput("");
-    };
-
     return (
         <ScrollView>
-            <View>
-                <Text className="pt-3 text-center">Create a new restaurant</Text>
-                <TextInput returnKeyType="done" className="border p-3 m-3" value={input} onChangeText={setInput} onEndEditing={handleCreate} />
+            <View className="items-center mt-2">
+                <Button onPress={() => router.push("/restaurants/create")} title="Create a new Restaurant" />
             </View>
             <View className="gap-y-2 mt-2">
                 {restaurants.map((r) => (

@@ -1,5 +1,5 @@
-import { Image, Text, View } from "react-native";
-import { Github } from "../../models/Github";
+import { ActivityIndicator, Image, Text, View } from "react-native";
+import { Github } from "../../../models/Github";
 import React from "react";
 
 export default function ProfilePage() {
@@ -15,15 +15,14 @@ export default function ProfilePage() {
             }
         };
 
-        fetchData()
-    }, [])
-    
+        fetchData();
+    }, []);
 
     return (
         <View className="flex flex-1 justify-center items-center">
             <Text className="text-blue-500">Profile page!</Text>
             <Text>Name: {account?.name}</Text>
-            <Image className="w-52 h-52 mx-auto" src={account?.avatar_url} />
+            {account ? <Image className="w-52 h-52 mx-auto" src={account?.avatar_url} /> : <ActivityIndicator />}
         </View>
     );
 }

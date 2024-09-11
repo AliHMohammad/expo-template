@@ -20,16 +20,22 @@ const INIT_DATA = [
 
 export default function RestaurantsPage() {
     const [restaurants, setRestaurants] = React.useState([...INIT_DATA]);
-    const { name } = useLocalSearchParams<{ name: string }>();
+    const { name, edited } = useLocalSearchParams<{ name: string; edited: string }>();
     const router = useRouter();
 
     useEffect(() => {
+        // Hvis edited og name er defineret, så skal usestate hooken opdateres
+        //! Nedenstående if er fordi vi laver ændringen lokalt. Normalt ville du ændre i db.
+        if (edited && name) {
+            setRestaurants((prev) => prev.map((r) => (r.name === name ? { ...r, name: edited } : r)));
+        }
+
         // Vi sender name tilbage som param fra create.tsx
-        // Derfor skal der ske noget hvis name param er defineret her. Usestate skal opdateres og trigger et rerender 
-        if (!name)
-            return;
-        setRestaurants((prev) => [...prev, { id: prev.length, name: name }]);
-    }, [name])
+        // Derfor skal der ske noget hvis name param er defineret her. Usestate skal opdateres og trigger et rerender
+        if (name && !edited) {
+            setRestaurants((prev) => [...prev, { id: prev.length, name: name }]);
+        }
+    }, [name, edited]);
 
     const handlePress = (name: string) => {
         // Du kan også skrive:

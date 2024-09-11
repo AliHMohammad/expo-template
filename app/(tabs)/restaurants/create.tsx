@@ -9,7 +9,10 @@ export default function CreateRestaurantPage() {
     const onCreate = () => {
         // Vi navigerer tilbage til restaurants, hvor vores state er.
         // Vi sender input tilbage som param "name"
-        router.navigate({ pathname: "/restaurants", params: { name: input } })
+        router.navigate({
+            pathname: "/restaurants",
+            params: { name: input }
+        })
     }
 
     return (

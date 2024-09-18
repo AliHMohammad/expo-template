@@ -1,6 +1,7 @@
 import { View, Text, Button, TextInput } from "react-native";
 import React from "react";
 import { router, Stack, useLocalSearchParams } from "expo-router";
+import RestaurantsEndpoint from "../../../services/RestaurantsEndpoint";
 
 export default function RestaurantPage() {
     // Endpoint værdi. Det ID vi har sendt afsted får vi fat i med nedenstående.
@@ -9,10 +10,9 @@ export default function RestaurantPage() {
     const [isEditing, setIsEditing] = React.useState(false);
 
     const handleEdit = () => {
-        router.navigate({
-            pathname: "/restaurants",
-            params: { id: id, name: input },
-        });
+        // Update og gå tilbage
+        RestaurantsEndpoint.updateRestaurant(id, { name: input });
+        router.back();
     };
 
     return (

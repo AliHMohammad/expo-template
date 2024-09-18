@@ -1,18 +1,16 @@
 import { View, Text, TextInput, Button } from "react-native";
 import React from "react";
 import { useRouter } from "expo-router";
+import RestaurantsEndpoint from "../../../services/RestaurantsEndpoint";
 
 export default function CreateRestaurantPage() {
     const [input, setInput] = React.useState("");
     const router = useRouter();
 
     const onCreate = () => {
-        // Vi navigerer tilbage til restaurants, hvor vores state er.
-        // Vi sender input tilbage som param "name"
-        router.navigate({
-            pathname: "/restaurants",
-            params: { name: input }
-        })
+        // Create og gå tilbage til sidste side
+        RestaurantsEndpoint.createRestaurant({ name: input });
+        router.back();
     }
 
     return (

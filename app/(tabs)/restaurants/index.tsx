@@ -10,27 +10,11 @@ import RestaurantsEndpoint from "../../../services/RestaurantsEndpoint";
 
 
 export default function RestaurantsPage() {
-    const { name, id } = useLocalSearchParams<{ name: string; id: string }>();
     const router = useRouter();
     // Konstant, aktiv forbindelse. Returnerer 3 værdier
     const [values, loading, error] = useCollection(collection(database, "restaurants"));
     // Values.docs er dine restaurants, men den har ikke Id på. Dem skal vi sætte på fra firebase.
     const restaurants = values?.docs.map((doc) => ({ ...doc.data(), id: doc.id })) as IRestaurant[];
-    
-    useEffect(() => {
-        try {
-            if (id && name) {
-                // Update
-                RestaurantsEndpoint.updateRestaurant(id, { name: name });
-            } else if (name) {
-                // Create
-                RestaurantsEndpoint.createRestaurant({ name });
-            }
-        } catch (error) {
-            console.log(error);
-        }
-       
-    }, [name, id]);
 
     const handlePress = ({name, id}: IRestaurant) => {
         // Du kan også skrive:

@@ -17,7 +17,14 @@ export default function TabLayout() {
                 options={{
                     title: "Restaurants",
                     tabBarIcon: ({ color }) => <FontAwesome size={28} name="search" color={color} />,
-                    headerShown: false
+                    headerShown: false,
+                }}
+            />
+            <Tabs.Screen
+                name="(images)"
+                options={{
+                    title: "Images",
+                    tabBarIcon: ({ color }) => <FontAwesome size={28} name="image" color={color} />,
                 }}
             />
             <Tabs.Screen

@@ -3,7 +3,7 @@ import React from "react";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import { storage } from "../../../firebase";
 import * as ImagePicker from "expo-image-picker";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import RestaurantsEndpoint from "../../../services/RestaurantsEndpoint";
 
 export default function RestaurantPage() {
@@ -27,6 +27,14 @@ export default function RestaurantPage() {
         // Update og gå tilbage
         RestaurantsEndpoint.updateRestaurant(id, { name: input });
         router.back();
+    };
+
+    const handleDelete = async () => {
+        const storageRef = ref(storage, `image_${id}`);
+        deleteObject(storageRef)
+            .then(() => setImagePath(""))
+            .then(() => alert("Image deleted"))
+            .catch(() => console.log("Could not delete image"));
     };
 
     const handleUpload = async () => {
@@ -73,6 +81,7 @@ export default function RestaurantPage() {
                 <>
                     <View className="mb-5">
                         {imagePath && <Image className="w-28 h-28" source={{ uri: imagePath }} />}
+                        {imagePath && <Button color="red" title="Delete Image" onPress={handleDelete} />}
                         <Button title={imagePath ? "Edit Image" : "Upload Image"} onPress={handleUpload} />
                     </View>
                     <View>

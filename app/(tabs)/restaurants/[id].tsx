@@ -1,46 +1,51 @@
-import { View, Text, Button, TextInput, Image } from "react-native";
+import { View, Text, Button, TextInput, Image, ScrollView } from "react-native";
 import React from "react";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import { storage } from "../../../firebase";
 import * as ImagePicker from "expo-image-picker";
-import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
+import { ref, uploadBytes, getDownloadURL, listAll, deleteObject } from "firebase/storage";
 import RestaurantsEndpoint from "../../../services/RestaurantsEndpoint";
 
 export default function RestaurantPage() {
-    // Endpoint værdi. Det ID vi har sendt afsted får vi fat i med nedenstående.
     const { id, name } = useLocalSearchParams<{ id: string; name: string }>();
     const [input, setInput] = React.useState(name);
-    const [imagePath, setImagePath] = React.useState("");
+    const [imagePaths, setImagePaths] = React.useState<string[]>([]);
     const [isEditing, setIsEditing] = React.useState(false);
 
     React.useEffect(() => {
-        // Vi henter det tilhørende billede fra firebase storage ud fra id'et på Restaurant
-        // Sæt det i useStaten imagePath
-        // Hvis intet billede er, så catch console.log()
-        const storageRef = ref(storage, `image_${id}`);
-        getDownloadURL(storageRef)
-            .then((url) => setImagePath(url))
-            .catch(() => console.log("No Image found"));
+        // Fetch all images related to the restaurant
+        const storageRef = ref(storage, `restaurant_images/${id}/`);
+        listAll(storageRef)
+            .then((result) => {
+                // Fetch URLs for all images
+                const urlPromises = result.items.map((imageRef) => getDownloadURL(imageRef));
+                Promise.all(urlPromises).then((urls) => setImagePaths(urls));
+            })
+            .catch(() => console.log("No Images found"));
     }, [id]);
 
     const handleEdit = () => {
-        // Update og gå tilbage
+        // Update restaurant details and navigate back
         RestaurantsEndpoint.updateRestaurant(id, { name: input });
         router.back();
     };
 
-    const handleDelete = async () => {
-        const storageRef = ref(storage, `image_${id}`);
-        deleteObject(storageRef)
-            .then(() => setImagePath(""))
-            .then(() => alert("Image deleted"))
+    const handleDelete = async (imageURL: string) => {
+        // Delete a specific image from Firebase Storage
+        const imageRef = ref(storage, imageURL);
+
+        deleteObject(imageRef)
+            .then(() => {
+                setImagePaths((prev) => prev.filter((url) => url !== imageURL));
+                alert("Image deleted");
+            })
             .catch(() => console.log("Could not delete image"));
     };
 
     const handleUpload = async () => {
-        // Vælg et billede fra album
+        // Select multiple images from the gallery
         const result = await ImagePicker.launchImageLibraryAsync({
-            allowsEditing: true,
+            allowsMultipleSelection: true,
         });
 
         if (result.canceled) {
@@ -48,24 +53,24 @@ export default function RestaurantPage() {
             return;
         }
 
-        const image = result.assets[0].uri;
+        const uploadPromises = result.assets.map(async (asset, index) => {
+            const imageUri = asset.uri;
+            const res = await fetch(imageUri);
+            const blob = await res.blob();
+            const imageRef = ref(storage, `restaurant_images/${id}/image_${Date.now()}_${index}.jpg`);
 
-        // Lave en blob
-        // Upload til firebase storage
-        // Sæt det i useStaten imagePath
-        const res = await fetch(image);
-        const blob = await res.blob();
-        const storageRef = ref(storage, `image_${id}`);
+            // Upload each image
+            await uploadBytes(imageRef, blob);
+            return getDownloadURL(imageRef); // Return the download URL of the image
+        });
 
-        await uploadBytes(storageRef, blob);
-
-        setImagePath(image);
-        alert("Image uploaded!");
+        const uploadedImageUrls = await Promise.all(uploadPromises);
+        setImagePaths((prev) => [...prev, ...uploadedImageUrls]); // Add new image URLs to the state
+        alert("Images uploaded!");
     };
 
     return (
         <View className="flex flex-1 justify-center items-center">
-            {/* Nedenstående ændrer din header til en dynamisk navn ud fra name */}
             <Stack.Screen
                 options={{
                     headerTitle: "Restaurant " + name,
@@ -73,16 +78,26 @@ export default function RestaurantPage() {
             />
             {!isEditing ? (
                 <>
-                    {imagePath && <Image className="w-28 h-28" source={{ uri: imagePath }} />}
+                    <ScrollView horizontal>
+                        {imagePaths.map((imagePath, index) => (
+                            <Image key={index} className="w-28 h-28 mr-2" source={{ uri: imagePath }} />
+                        ))}
+                    </ScrollView>
                     <Text>Name: {name}</Text>
                     <Button title="Edit" onPress={() => setIsEditing(true)} />
                 </>
             ) : (
                 <>
+                    <ScrollView horizontal>
+                        {imagePaths.map((imagePath, index) => (
+                            <View key={index} className="mr-2">
+                                <Image className="w-28 h-28" source={{ uri: imagePath }} />
+                                <Button color="red" title="Delete Image" onPress={() => handleDelete(imagePath)} />
+                            </View>
+                        ))}
+                    </ScrollView>
                     <View className="mb-5">
-                        {imagePath && <Image className="w-28 h-28" source={{ uri: imagePath }} />}
-                        {imagePath && <Button color="red" title="Delete Image" onPress={handleDelete} />}
-                        <Button title={imagePath ? "Edit Image" : "Upload Image"} onPress={handleUpload} />
+                        <Button title="Upload Images" onPress={handleUpload} />
                     </View>
                     <View>
                         <TextInput className="border m-3 p-2" value={input} onChangeText={setInput} />

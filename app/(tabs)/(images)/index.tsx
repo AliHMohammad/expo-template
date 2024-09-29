@@ -2,7 +2,7 @@ import { Button, Image, View } from "react-native";
 import React from "react";
 import * as ImagePicker from "expo-image-picker";
 import { storage } from "../../../firebase";
-import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
+import { ref, uploadBytes, getDownloadURL, deleteObject, uploadBytesResumable } from "firebase/storage";
 
 export default function ImagesPage() {
     const [isFetched, setIsFetched] = React.useState(false);
@@ -35,10 +35,31 @@ export default function ImagesPage() {
         const blob = await res.blob();
         const storageRef = ref(storage, `image_ali`);
 
-        await uploadBytes(storageRef, blob);
+        await uploadBytesResumable(storageRef, blob);
 
         setIsFetched(true);
         alert("Image uploaded!");
+    };
+
+    const launchCamera = async () => {
+        const permission = await ImagePicker.requestCameraPermissionsAsync();
+
+        if (permission.granted === false) {
+            alert("Camera access not provded");
+            return;
+        }
+
+        const result = await ImagePicker.launchCameraAsync({
+            // Options
+            quality: 1, // ikke nødvendig
+        });
+
+        if (result.canceled) {
+            return;
+        }
+        
+        setImagePath(result.assets[0].uri);
+        setIsFetched(false);
     };
 
     const handleDelete = async () => {
@@ -57,12 +78,16 @@ export default function ImagesPage() {
             {imagePath && (
                 <View className="mt-5">
                     <Image className="w-72 h-72" source={{ uri: imagePath }} />
-                    {!isFetched ? <Button onPress={handleUpload} title="Upload to Firebase Storage" /> : <Button onPress={handleDelete} color="red" title="Delete" />}
-                    
+                    {!isFetched ? (
+                        <Button onPress={handleUpload} title="Upload to Firebase Storage" />
+                    ) : (
+                        <Button onPress={handleDelete} color="red" title="Delete" />
+                    )}
                 </View>
             )}
             <View className="flex-1 justify-center">
                 <Button onPress={handleClick} title="Pick image" />
+                <Button title="Take Picture" onPress={launchCamera} />
             </View>
         </View>
     );

@@ -28,10 +28,10 @@ export default function TabLayout() {
                 }}
             />
             <Tabs.Screen
-                name="(profile)"
+                name="(map)"
                 options={{
-                    title: "Profile",
-                    tabBarIcon: ({ color }) => <FontAwesome size={28} name="male" color={color} />,
+                    title: "Map",
+                    tabBarIcon: ({ color }) => <FontAwesome size={28} name="map" color={color} />,
                 }}
             />
         </Tabs>

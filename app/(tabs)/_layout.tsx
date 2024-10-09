@@ -31,7 +31,8 @@ export default function TabLayout() {
                 name="(map)"
                 options={{
                     title: "Map",
-                    tabBarIcon: ({ color }) => <FontAwesome size={28} name="map" color={color} />,
+                    tabBarIcon: ({ color }) => <FontAwesome size={28} name="map-marker" color={color} />,
+                    headerShown: false
                 }}
             />
         </Tabs>

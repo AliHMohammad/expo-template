@@ -32,10 +32,16 @@ export default function TabLayout() {
                 options={{
                     title: "Map",
                     tabBarIcon: ({ color }) => <FontAwesome size={28} name="map-marker" color={color} />,
-                    headerShown: false
+                    headerShown: false,
+                }}
+            />
+            <Tabs.Screen
+                name="user"
+                options={{
+                    title: "Profile",
+                    tabBarIcon: ({ color }) => <FontAwesome size={28} name="user" color={color} />,
                 }}
             />
         </Tabs>
     );
 }
-

@@ -15,7 +15,8 @@ export default function SignupPage() {
 
     const onSignup = async () => {
         try {
-            await createUserWithEmailAndPassword(auth, signup.email, signup.password);
+            const userCredentials = await createUserWithEmailAndPassword(auth, signup.email, signup.password);
+            //userCredentials.user
             setSignup(INIT_FORM);
             router.back();
         } catch (error) {

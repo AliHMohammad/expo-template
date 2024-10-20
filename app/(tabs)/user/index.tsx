@@ -1,39 +1,27 @@
 import { Button, Text, View } from "react-native";
-import React, { useCallback } from "react";
+import React from "react";
 import { auth } from "../../../firebase";
-import { useFocusEffect, useRouter } from "expo-router";
-
-const INIT_FORM = {
-    email: "",
-    password: "",
-};
+import { useRouter } from "expo-router";
+import { onAuthStateChanged } from "firebase/auth";
 
 export default function UserPage() {
     const [user, setUser] = React.useState(auth.currentUser);
     const router = useRouter();
 
-    useFocusEffect(
-        useCallback(() => {
-            console.log("Hello, I am focused router!");
-            // Opdaterer din useState efter login/signup fra anden router.
-            setUser(auth.currentUser);
-
-            return () => {
-                console.log("This route is now unfocused.");
-            };
-        }, []),
-    );
+    onAuthStateChanged(auth, (user) => {
+        // Får den til at re-render denne side.
+        setUser(user);
+    });
 
     const handleLogout = async () => {
-        auth.signOut();
-        setUser(null);
+        await auth.signOut();
     };
 
     return (
         <View className="flex-1">
             {user ? (
                 <>
-                    <Text>Hello {user.email}</Text>
+                    <Text className="text-center">Hello {user.email}</Text>
                     <Button title="Log out" color="red" onPress={handleLogout} />
                 </>
             ) : (

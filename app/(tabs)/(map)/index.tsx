@@ -94,7 +94,7 @@ export default function MapPage() {
     return (
         <View className="flex-1">
             {loading ? (
-                <ActivityIndicator />
+                <ActivityIndicator className="flex-1" size="large" />
             ) : (
                 <MapView region={region} showsUserLocation onLongPress={handleLongPress} className="w-full h-full">
                     {markers?.map((marker) => (

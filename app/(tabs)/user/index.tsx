@@ -1,7 +1,7 @@
-import { Button, Text, TextInput, View } from "react-native";
-import React from "react";
+import { Button, Text, View } from "react-native";
+import React, { useCallback } from "react";
 import { auth } from "../../../firebase";
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { useFocusEffect, useRouter } from "expo-router";
 
 const INIT_FORM = {
     email: "",
@@ -9,85 +9,39 @@ const INIT_FORM = {
 };
 
 export default function UserPage() {
-    const [signup, setSignup] = React.useState(INIT_FORM);
-    const [login, setLogin] = React.useState(INIT_FORM);
-
     const [user, setUser] = React.useState(auth.currentUser);
+    const router = useRouter();
 
-    const onSignup = async () => {
-        try {
-            const usercreds = await createUserWithEmailAndPassword(auth, signup.email, signup.password);
-            setSignup(INIT_FORM);
-            setUser(usercreds.user);
-        } catch (error) {
-            console.log("Could not sign up user");
-        }
-    };
+    useFocusEffect(
+        useCallback(() => {
+            console.log("Hello, I am focused router!");
+            // Opdaterer din useState efter login/signup fra anden router.
+            setUser(auth.currentUser);
+
+            return () => {
+                console.log("This route is now unfocused.");
+            };
+        }, []),
+    );
 
     const handleLogout = async () => {
-        signOut(auth);
+        auth.signOut();
         setUser(null);
     };
 
-    const onLogin = async () => {
-        try {
-            const usercreds = await signInWithEmailAndPassword(auth, login.email, login.password);
-            setLogin(INIT_FORM);
-            setUser(usercreds.user);
-        } catch (error) {
-            console.log("Could not login user");
-        }
-    };
-
     return (
-        <>
-            <View>
-                <Text className="pt-3 text-center">Create user</Text>
-
-                <Text className="pt-3 text-center">Email</Text>
-                <TextInput
-                    textContentType="emailAddress"
-                    returnKeyType="done"
-                    className="border p-3 m-3"
-                    value={signup.email}
-                    onChangeText={(v) => setSignup((prev) => ({ ...prev, email: v }))}
-                />
-                <Text className="pt-3 text-center">Password</Text>
-                <TextInput
-                    textContentType="password"
-                    returnKeyType="done"
-                    className="border p-3 m-3"
-                    value={signup.password}
-                    onChangeText={(v) => setSignup((prev) => ({ ...prev, password: v }))}
-                />
-                <Button title="Submit" onPress={onSignup} />
-            </View>
+        <View className="flex-1">
             {user ? (
-                <View className="flex-1 items-center mt-5">
-                    <Text>Hello {auth.currentUser?.email}</Text>
-                    <Button title="Log out" onPress={handleLogout} />
-                </View>
+                <>
+                    <Text>Hello {user.email}</Text>
+                    <Button title="Log out" color="red" onPress={handleLogout} />
+                </>
             ) : (
-                <View className="mt-5">
-                    <Text className="pt-3 text-center">Login user</Text>
-
-                    <Text className="pt-3 text-center">Email</Text>
-                    <TextInput
-                        returnKeyType="done"
-                        className="border p-3 m-3"
-                        value={login.email}
-                        onChangeText={(v) => setLogin((prev) => ({ ...prev, email: v }))}
-                    />
-                    <Text className="pt-3 text-center">Password</Text>
-                    <TextInput
-                        returnKeyType="done"
-                        className="border p-3 m-3"
-                        value={login.password}
-                        onChangeText={(v) => setLogin((prev) => ({ ...prev, password: v }))}
-                    />
-                    <Button title="Submit" onPress={onLogin} />
+                <View className="flex-1 items-center justify-evenly">
+                    <Button title="Login" onPress={() => router.navigate("/user/login")} />
+                    <Button title="Signup" onPress={() => router.navigate("/user/signup")} />
                 </View>
             )}
-        </>
+        </View>
     );
 }

@@ -34,7 +34,7 @@ export default function RestaurantsPage() {
     return (
         <ScrollView className={`${theme.backgroundColor}`}>
             <View className="items-center mt-2">
-                <Button color="red" onPress={() => router.push("/restaurants/create")} title="Create a new Restaurant" />
+                <Button onPress={() => router.push("/restaurants/create")} title="Create a new Restaurant" />
             </View>
             <View className="gap-y-2 mt-2">
                 {loading ? (

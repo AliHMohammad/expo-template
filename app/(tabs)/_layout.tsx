@@ -1,10 +1,13 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Tabs } from "expo-router";
+import { useStyling } from "../../contexts/StyleContext";
 
 // Vi fortæller hvordan vores tab naviagtion skal se ud.
 export default function TabLayout() {
+    const { theme } = useStyling();
+
     return (
-        <Tabs screenOptions={{ tabBarActiveTintColor: "blue" }}>
+        <Tabs screenOptions={{ tabBarActiveTintColor: "blue", tabBarStyle: {backgroundColor: theme.tabBackground}, headerStyle: {backgroundColor: theme.tabBackground} }}>
             <Tabs.Screen
                 name="(home)"
                 options={{

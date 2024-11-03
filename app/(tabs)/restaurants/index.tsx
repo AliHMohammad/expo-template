@@ -1,4 +1,4 @@
-import { ActivityIndicator, Button, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Button, ScrollView, View } from "react-native";
 import { useRouter } from "expo-router";
 import { RestaurantCard } from "../../../components/RestaurantCard";
 import React from "react";
@@ -8,12 +8,10 @@ import { useCollection } from "react-firebase-hooks/firestore";
 import IRestaurant from "../../../models/Restaurant";
 import RestaurantsEndpoint from "../../../services/RestaurantsEndpoint";
 import { useStyling } from "../../../contexts/StyleContext";
-import { PanGestureHandler, GestureHandlerRootView } from "react-native-gesture-handler";
-
 
 export default function RestaurantsPage() {
     const router = useRouter();
-    const {theme} = useStyling();
+    const { theme } = useStyling();
     // Konstant, aktiv forbindelse. Returnerer 3 værdier
     const [values, loading, error] = useCollection(collection(database, "restaurants"));
     // Values.docs er dine restaurants, men den har ikke Id på. Dem skal vi sætte på fra firebase.
@@ -42,11 +40,9 @@ export default function RestaurantsPage() {
                     <ActivityIndicator size={"large"} />
                 ) : (
                     restaurants?.map((r) => (
-                        <View className="flex flex-row" key={r.id}>
-                            <RestaurantCard className={`mx-2 w-80 ${theme.restaurantCardStyle}`} name={r.name} onPress={() => handlePress(r)} />
-                            <TouchableOpacity className="flex justify-center items-center" onPress={() => handleDelete(r.id)}>
-                                <Text className={theme.textStyle}>Delete</Text>
-                            </TouchableOpacity>
+                        <View className="flex flex-row justify-center" key={r.id}>
+                            <RestaurantCard className={`w-80  ${theme.restaurantCardStyle}`} restaurant={r} onPress={() => handlePress(r)} onDelete={handleDelete} />
+                            
                         </View>
                     ))
                 )}

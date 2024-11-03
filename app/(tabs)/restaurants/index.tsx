@@ -8,6 +8,7 @@ import { useCollection } from "react-firebase-hooks/firestore";
 import IRestaurant from "../../../models/Restaurant";
 import RestaurantsEndpoint from "../../../services/RestaurantsEndpoint";
 import { useStyling } from "../../../contexts/StyleContext";
+import { PanGestureHandler, GestureHandlerRootView } from "react-native-gesture-handler";
 
 
 export default function RestaurantsPage() {

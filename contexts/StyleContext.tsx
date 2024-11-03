@@ -1,7 +1,7 @@
 import React from "react";
 import { useColorScheme } from "react-native";
 
-type TStyle = { backgroundColor: string; textStyle?: string; restaurantCardStyle?: string, tabBackground?: string };
+type TStyle = { backgroundColor: string; textStyle?: string; restaurantCardStyle?: string; tabBackground?: string };
 
 type StyleContextType = {
     theme: TStyle;
@@ -26,10 +26,11 @@ export default function StyleProvider(props: { children: React.ReactNode }) {
 
     const theme = colorScheme === "light" ? lightTheme : darkTheme;
 
+    console.log(colorScheme);
+
     return <StyleContext.Provider value={{ theme }}>{props.children}</StyleContext.Provider>;
 }
 
 export function useStyling() {
     return React.useContext(StyleContext);
 }
-
